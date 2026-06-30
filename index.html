@@ -68,6 +68,7 @@ body{color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sa
 .cbg-n{background:var(--nflx);color:#fff}.cbg-t{background:var(--stage);color:#fff}
 .cbg-a{background:#7b2d8b;color:#fff}.cbg-d{background:var(--s4);color:var(--t2)}
 .cbg-g{background:var(--gold);color:#000}.cbg-h{background:var(--hulu);color:#fff}
+.cbg-s{background:rgba(201,162,39,.22);color:var(--gold);border:1px solid rgba(201,162,39,.4)}
 .cwl{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
 .cwl.on{color:var(--gold)}
 .cqw{position:absolute;top:5px;left:5px;width:22px;height:22px;border-radius:50%;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:background .2s}
@@ -76,6 +77,7 @@ body{color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sa
 .skel-row{display:flex;gap:10px;padding:0 14px 8px;overflow:hidden}
 .skel-c{flex-shrink:0;width:118px;aspect-ratio:2/3;border-radius:var(--r);background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:shim 1.5s infinite}
 @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.tonight-skel{height:180px;margin:0 14px;border-radius:12px;background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:shim 1.5s infinite}
 .tv-banner{display:flex;align-items:center;gap:12px;margin:0 14px 8px;padding:11px 13px;background:linear-gradient(135deg,var(--s2),var(--s3));border-radius:var(--r);border:1px solid rgba(255,255,255,.07);cursor:pointer;text-decoration:none;transition:border-color .2s}
 .tv-banner:hover{border-color:var(--gold)}
 .tv-logo{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#fff;flex-shrink:0;text-align:center;line-height:1.3}
@@ -202,9 +204,10 @@ var IW='https://image.tmdb.org/t/p/w342';
 var IB='https://image.tmdb.org/t/p/w780';
 var IO='https://image.tmdb.org/t/p/original';
 var IF='https://image.tmdb.org/t/p/w138_and_h175_face';
+var EXCL_GENRES='27|35|36|99|10752|10402';
 var SVC_SEARCH={'U-NEXT':'https://video.unext.jp/search?query=','Amazon Prime Video':'https://www.amazon.co.jp/s?i=instant-video&k=','Prime Video':'https://www.amazon.co.jp/s?i=instant-video&k=','Netflix':'https://www.netflix.com/search?q=','Hulu':'https://www.hulu.jp/search#','Disney Plus':'https://www.disneyplus.com/search/'};
 var PROV_IDS={unext:'39',prime:'9|119',nflx:'8|213',hulu:'11',disney:'337'};
-var S={myList:[],watched:[],ratings:{},pc:{},hi:[],hx:0,ht:null,st:null,genreMap:{},prefs:{genres:[28,878,53,9648],services:['unext','prime'],setup:false}};
+var S={myList:[],watched:[],ratings:{},pc:{},hi:[],hx:0,ht:null,st:null,genreMap:{},prefs:{genres:[28,878,53,9648,16],services:['unext','prime'],setup:false}};
 var qSvc=[],qGenres=[];
 
 function loadSt(){
@@ -242,7 +245,7 @@ function getGenreWeights(){
 function getTopGenreStr(n){
   var w=getGenreWeights();
   var top=Object.keys(w).filter(function(g){return w[g]>0;}).sort(function(a,b){return w[b]-w[a];}).slice(0,n||5);
-  return top.length?top.join('|'):'28|878|53|9648';
+  return top.length?top.join('|'):'28|878|53|9648|16';
 }
 function getSubProvStr(){
   var parts=[];
@@ -284,34 +287,40 @@ function goTab(t){
 }
 
 var SECS=[
-  {id:'pick',    title:'🏆 今週のあなたへのイチオシ', fn:sPick},
-  {id:'trend',   title:'🔥 今週のトレンド',            fn:sTrend},
-  {id:'theater', title:'🎬 映画館で上映中',             fn:sTheater},
-  {id:'rec',     title:'⭐ あなたへのおすすめ',         fn:sRec},
-  {id:'unext',   title:'📺 U-NEXTで配信中',            fn:sUnext, svcKey:'unext'},
-  {id:'prime',   title:'▶ Amazon Primeで配信中',       fn:sPrime, svcKey:'prime'},
-  {id:'nflx',    title:'🎥 Netflixで配信中',           fn:sNflx,  svcKey:'nflx'},
-  {id:'hulu',    title:'📺 Huluで配信中',              fn:sHulu,  svcKey:'hulu'},
-  {id:'disney',  title:'✨ Disney+で配信中',            fn:sDisney,svcKey:'disney'},
-  {id:'anime',   title:'🌸 アニメ 最新・話題作',        fn:sAnime},
-  {id:'drama',   title:'🎭 日本ドラマ・注目作',         fn:sDrama},
-  {id:'korean',  title:'🇰🇷 韓国・アジア映画',          fn:sKorean},
-  {id:'tver',    title:'📡 TVer・地上波リンク',         fn:sTver},
+  {id:'tonight',    title:'🎯 今夜の1本',                   fn:sTonightPick},
+  {id:'pick',       title:'🏆 今週のあなたへのイチオシ',      fn:sPick},
+  {id:'theater-rec',title:'🎬 映画館×あなたの好み',          fn:sTheaterRec},
+  {id:'twist',      title:'🔀 どんでん返し・タイムリープ',    fn:sTwist},
+  {id:'director',   title:'🎬 C.ノーラン未視聴作品',         fn:sDirector},
+  {id:'short',      title:'⏱ サクッと見れる（〜100分）',     fn:sShort},
+  {id:'trend',      title:'🔥 今週のトレンド',               fn:sTrend},
+  {id:'theater',    title:'📽 映画館で上映中',               fn:sTheater},
+  {id:'rec',        title:'⭐ あなたへのおすすめ',           fn:sRec},
+  {id:'unext',      title:'📺 U-NEXTで配信中',              fn:sUnext, svcKey:'unext'},
+  {id:'prime',      title:'▶ Amazon Primeで配信中',         fn:sPrime, svcKey:'prime'},
+  {id:'nflx',       title:'🎥 Netflixで配信中',             fn:sNflx,  svcKey:'nflx'},
+  {id:'hulu',       title:'📺 Huluで配信中',                fn:sHulu,  svcKey:'hulu'},
+  {id:'disney',     title:'✨ Disney+で配信中',              fn:sDisney,svcKey:'disney'},
+  {id:'anime',      title:'🌸 アニメ 最新・話題作',          fn:sAnime},
+  {id:'drama',      title:'🎭 日本ドラマ・注目作',           fn:sDrama},
+  {id:'korean',     title:'🇰🇷 韓国・アジア映画',            fn:sKorean},
+  {id:'tver',       title:'📡 TVer・地上波リンク',           fn:sTver},
 ];
 
 function buildHome(){
   var el=document.getElementById('tab-home');
-  var h='';
-  h+='<div id="hero-wrap" style="position:relative;width:100%;height:60vw;min-height:260px;max-height:420px;overflow:hidden;background:var(--s2);margin-bottom:4px"><div class="loading"><div class="spin"></div></div></div>';
+  var h='<div id="hero-wrap" style="position:relative;width:100%;height:60vw;min-height:260px;max-height:420px;overflow:hidden;background:var(--s2);margin-bottom:4px"><div class="loading"><div class="spin"></div></div></div>';
   for(var i=0;i<SECS.length;i++){
     var s=SECS[i];
     if(!secVisible(s))continue;
+    if(s.id==='tonight'){
+      h+='<div class="section" id="sec-tonight"><div class="sec-hdr"><span class="sec-title" style="color:var(--gold2);font-size:16px">🎯 今夜の1本</span></div><div class="tonight-skel"></div></div>';
+      continue;
+    }
     var isPick=s.id==='pick';
-    h+='<div class="section" id="sec-'+s.id+'">';
-    h+='<div class="sec-hdr"><span class="sec-title">'+s.title+'</span>';
+    h+='<div class="section" id="sec-'+s.id+'"><div class="sec-hdr"><span class="sec-title">'+s.title+'</span>';
     if(isPick)h+='<span class="sec-action" onclick="openQ()">好みを変更</span>';
-    h+='</div>';
-    h+='<div class="skel-row">';
+    h+='</div><div class="skel-row">';
     for(var j=0;j<7;j++)h+='<div class="skel-c"></div>';
     h+='</div></div>';
   }
@@ -368,45 +377,149 @@ function fill(sec,items,type){
   h+='</div>';el.innerHTML=h;
 }
 
+function sTonightPick(sec){
+  var gStr=getTopGenreStr(3);
+  var provStr=getSubProvStr();
+  return tmdb('/discover/movie',{with_genres:gStr,sort_by:'vote_average.desc','vote_count.gte':500,watch_region:'JP',with_watch_providers:provStr,with_original_language:'en|ja',without_genres:EXCL_GENRES}).then(function(d){
+    var items=(d.results||[]).filter(function(m){return S.watched.indexOf(m.id)===-1;});
+    var el=document.getElementById('sec-tonight');
+    if(!el)return;
+    if(!items.length){el.style.display='none';return;}
+    var m=items[0];
+    var bg=m.backdrop_path?(IB+m.backdrop_path):'';
+    var poster=m.poster_path?(IW+m.poster_path):'';
+    var title=m.title||'';
+    var rat=m.vote_average?m.vote_average.toFixed(1):'';
+    var year=(m.release_date||'').slice(0,4);
+    var saved=S.myList.indexOf(m.id)!==-1;
+    var watched=S.watched.indexOf(m.id)!==-1;
+    var h='<div class="sec-hdr"><span class="sec-title" style="color:var(--gold2);font-size:16px">🎯 今夜の1本</span><span class="sec-action" onclick="refreshTonight()">別の作品</span></div>';
+    h+='<div style="margin:0 14px 14px;border-radius:12px;overflow:hidden;position:relative;cursor:pointer;background:var(--s2)" onclick="openModal('+m.id+',\'movie\')">';
+    if(bg)h+='<img src="'+bg+'" alt="" style="width:100%;height:150px;object-fit:cover;display:block">';
+    h+='<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(6,8,16,.96) 35%,rgba(6,8,16,.2) 75%,transparent)"></div>';
+    h+='<div style="position:absolute;bottom:0;left:0;right:0;padding:10px 12px;display:flex;gap:10px;align-items:flex-end">';
+    if(poster)h+='<img src="'+poster+'" alt="" style="width:55px;height:82px;object-fit:cover;border-radius:6px;flex-shrink:0;border:2px solid var(--gold)">';
+    h+='<div style="flex:1;min-width:0">';
+    h+='<div style="font-size:15px;font-weight:800;margin-bottom:3px;line-height:1.3">'+esc(title)+'</div>';
+    h+='<div style="font-size:12px;color:var(--t2);margin-bottom:8px">★ '+esc(rat)+'　'+esc(year)+'　✓ サブスク配信中</div>';
+    h+='<div style="display:flex;gap:6px" onclick="event.stopPropagation()">';
+    h+='<button class="hbtn hbtn-p" style="font-size:12px;padding:6px 14px" onclick="openModal('+m.id+',\'movie\')">▶ 詳細</button>';
+    h+='<button class="hbtn hbtn-i" style="font-size:12px;padding:6px 10px'+(watched?';color:var(--stage)':'')+'" id="tonight-wd" onclick="cqwTonightC(event,'+m.id+')">'+(watched?'✅ 視聴済':'👁 視聴済')+'</button>';
+    h+='<button class="hbtn-w" style="color:'+(saved?'var(--gold)':'#fff')+'" onclick="hWL(event,'+m.id+')">'+(saved?'♥':'♡')+'</button>';
+    h+='</div></div></div></div>';
+    el.innerHTML=h;
+  });
+}
+function cqwTonightC(e,id){
+  e.stopPropagation();
+  var i=S.watched.indexOf(id);
+  if(i===-1){
+    S.watched.push(id);
+    if(!S.genreMap[String(id)]){
+      tmdb('/movie/'+id).then(function(d){if(d.genres){S.genreMap[String(id)]=d.genres.map(function(g){return g.id;});saveGM();}}).catch(function(){});
+    }
+  } else S.watched.splice(i,1);
+  saveW();
+  var on=S.watched.indexOf(id)!==-1;
+  var b=document.getElementById('tonight-wd');
+  if(b)b.innerHTML=on?'✅ 視聴済':'👁 視聴済';
+}
+function refreshTonight(){
+  var sec=SECS.find?SECS.filter(function(s){return s.id==='tonight';})[0]:null;
+  if(!sec)for(var i=0;i<SECS.length;i++){if(SECS[i].id==='tonight'){sec=SECS[i];break;}}
+  if(sec)sec.fn(sec).catch(function(){});
+}
+
 function sPick(sec){
   var gStr=getTopGenreStr(5);
   var provStr=getSubProvStr();
   return Promise.all([
-    tmdb('/discover/movie',{with_genres:gStr,sort_by:'vote_average.desc','vote_count.gte':300,watch_region:'JP',with_watch_providers:provStr,with_original_language:'en|ja|ko',without_genres:'27'}),
-    tmdb('/discover/movie',{with_genres:gStr,sort_by:'popularity.desc','vote_count.gte':200,watch_region:'JP',with_watch_providers:provStr,without_genres:'27'})
+    tmdb('/discover/movie',{with_genres:gStr,sort_by:'vote_average.desc','vote_count.gte':300,watch_region:'JP',with_watch_providers:provStr,with_original_language:'en|ja',without_genres:EXCL_GENRES}),
+    tmdb('/discover/movie',{with_genres:gStr,sort_by:'popularity.desc','vote_count.gte':200,watch_region:'JP',with_watch_providers:provStr,without_genres:EXCL_GENRES}),
+    tmdb('/discover/movie',{with_genres:'878|53|9648',sort_by:'vote_average.desc','vote_count.gte':400,watch_region:'JP',with_watch_providers:provStr,without_genres:EXCL_GENRES})
   ]).then(function(r){
     var seen={},items=[];
     function add(arr){(arr||[]).forEach(function(m){if(!seen[m.id]&&S.watched.indexOf(m.id)===-1){seen[m.id]=true;m._pick=true;items.push(m);}});}
+    add(r[0].results);add(r[1].results);add(r[2].results);
+    fill(sec,items.slice(0,18),'movie');
+  });
+}
+
+function sTheaterRec(sec){
+  var gStr=getTopGenreStr(5);
+  var today=new Date();
+  var past=new Date(today.getTime()-50*24*60*60*1000);
+  function fmt(d){return d.toISOString().slice(0,10);}
+  return tmdb('/discover/movie',{'primary_release_date.gte':fmt(past),'primary_release_date.lte':fmt(today),with_genres:gStr,sort_by:'popularity.desc',region:'JP',without_genres:EXCL_GENRES,'vote_count.gte':5}).then(function(d){
+    var its=(d.results||[]).slice(0,12);
+    its.forEach(function(m){m._th=true;});
+    fill(sec,its,'movie');
+  });
+}
+
+function sTwist(sec){
+  var provStr=getSubProvStr();
+  return Promise.all([
+    tmdb('/discover/movie',{with_genres:'878|53|9648',sort_by:'vote_average.desc','vote_count.gte':400,watch_region:'JP',with_watch_providers:provStr,without_genres:EXCL_GENRES,with_original_language:'en|ja'}),
+    tmdb('/discover/movie',{with_keywords:'4379',sort_by:'popularity.desc','vote_count.gte':80,watch_region:'JP',with_watch_providers:provStr,without_genres:EXCL_GENRES})
+  ]).then(function(r){
+    var seen={},items=[];
+    function add(arr){(arr||[]).forEach(function(m){if(!seen[m.id]&&S.watched.indexOf(m.id)===-1){seen[m.id]=true;m._sub=true;items.push(m);}});}
     add(r[0].results);add(r[1].results);
+    items.sort(function(a,b){return b.vote_average-a.vote_average;});
     fill(sec,items.slice(0,15),'movie');
   });
 }
+
+function sDirector(sec){
+  return tmdb('/person/525/movie_credits').then(function(d){
+    var seen={},items=[];
+    (d.crew||[]).forEach(function(m){
+      if(m.job==='Director'&&!seen[m.id]&&S.watched.indexOf(m.id)===-1&&(m.vote_count||0)>50){
+        seen[m.id]=true;items.push(m);
+      }
+    });
+    items.sort(function(a,b){return b.vote_average-a.vote_average;});
+    fill(sec,items.slice(0,10),'movie');
+  });
+}
+
+function sShort(sec){
+  var gStr=getTopGenreStr(4);
+  var provStr=getSubProvStr();
+  return tmdb('/discover/movie',{with_genres:gStr,sort_by:'vote_average.desc','vote_count.gte':100,'with_runtime.lte':100,watch_region:'JP',with_watch_providers:provStr,without_genres:EXCL_GENRES,with_original_language:'en|ja'}).then(function(d){
+    var its=(d.results||[]).filter(function(m){return S.watched.indexOf(m.id)===-1;}).slice(0,12);
+    its.forEach(function(m){m._sub=true;});
+    fill(sec,its,'movie');
+  });
+}
+
 function sTrend(sec){return tmdb('/trending/all/week',{region:'JP'}).then(function(d){fill(sec,(d.results||[]).slice(0,16),'auto');});}
 function sTheater(sec){return tmdb('/movie/now_playing',{region:'JP'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._th=true;});fill(sec,its,'movie');});}
 function sRec(sec){
   var gStr=getTopGenreStr(4);
   return Promise.all([
-    tmdb('/discover/movie',{with_genres:gStr,sort_by:'popularity.desc','vote_count.gte':200,with_original_language:'en|ja|ko',watch_region:'JP',without_genres:'27'}),
+    tmdb('/discover/movie',{with_genres:gStr,sort_by:'popularity.desc','vote_count.gte':200,with_original_language:'en|ja',watch_region:'JP',without_genres:EXCL_GENRES}),
     tmdb('/person/525/movie_credits'),
   ]).then(function(r){
     var seen={},items=[];
     function add(arr){(arr||[]).forEach(function(m){if(!seen[m.id]&&S.watched.indexOf(m.id)===-1){seen[m.id]=true;items.push(m);}});}
     add(r[0].results);
-    add((r[1].crew||[]).filter(function(m){return m.job==='Director'&&m.vote_average>6;}));
+    add((r[1].crew||[]).filter(function(m){return m.job==='Director'&&m.vote_average>6&&S.watched.indexOf(m.id)===-1;}));
     fill(sec,items.slice(0,18),'movie');
   });
 }
-function sUnext(sec){return tmdb('/discover/movie',{with_watch_providers:'39',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='U-NEXT';m._pc='cbg-u';});fill(sec,its,'movie');});}
-function sPrime(sec){return tmdb('/discover/movie',{with_watch_providers:'9|119',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Prime';m._pc='cbg-p';});fill(sec,its,'movie');});}
-function sNflx(sec){return tmdb('/discover/movie',{with_watch_providers:'8|213',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Netflix';m._pc='cbg-n';});fill(sec,its,'movie');});}
-function sHulu(sec){return tmdb('/discover/movie',{with_watch_providers:'11',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Hulu';m._pc='cbg-h';});fill(sec,its,'movie');});}
-function sDisney(sec){return tmdb('/discover/movie',{with_watch_providers:'337',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Disney+';m._pc='cbg-p';});fill(sec,its,'movie');});}
+function sUnext(sec){return tmdb('/discover/movie',{with_watch_providers:'39',watch_region:'JP',sort_by:'popularity.desc',without_genres:EXCL_GENRES}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='U-NEXT';m._pc='cbg-u';});fill(sec,its,'movie');});}
+function sPrime(sec){return tmdb('/discover/movie',{with_watch_providers:'9|119',watch_region:'JP',sort_by:'popularity.desc',without_genres:EXCL_GENRES}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Prime';m._pc='cbg-p';});fill(sec,its,'movie');});}
+function sNflx(sec){return tmdb('/discover/movie',{with_watch_providers:'8|213',watch_region:'JP',sort_by:'popularity.desc',without_genres:EXCL_GENRES}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Netflix';m._pc='cbg-n';});fill(sec,its,'movie');});}
+function sHulu(sec){return tmdb('/discover/movie',{with_watch_providers:'11',watch_region:'JP',sort_by:'popularity.desc',without_genres:EXCL_GENRES}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Hulu';m._pc='cbg-h';});fill(sec,its,'movie');});}
+function sDisney(sec){return tmdb('/discover/movie',{with_watch_providers:'337',watch_region:'JP',sort_by:'popularity.desc',without_genres:EXCL_GENRES}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Disney+';m._pc='cbg-p';});fill(sec,its,'movie');});}
 function sAnime(sec){
   return jk('/seasons/now?limit=24').then(function(d){fill(sec,(d.data||[]).slice(0,16),'anime');})
   .catch(function(){return tmdb('/discover/tv',{with_genres:'16',with_original_language:'ja',sort_by:'popularity.desc'}).then(function(d){fill(sec,(d.results||[]).slice(0,15),'tv');});});
 }
-function sDrama(sec){return tmdb('/discover/tv',{with_original_language:'ja',sort_by:'popularity.desc',without_genres:'16',watch_region:'JP'}).then(function(d){fill(sec,(d.results||[]).slice(0,15),'tv');});}
-function sKorean(sec){return tmdb('/discover/movie',{with_original_language:'ko|zh',with_genres:'28|80|53',sort_by:'popularity.desc','vote_count.gte':80}).then(function(d){fill(sec,(d.results||[]).slice(0,15),'movie');});}
+function sDrama(sec){return tmdb('/discover/tv',{with_original_language:'ja',sort_by:'popularity.desc',without_genres:'16|'+EXCL_GENRES,watch_region:'JP'}).then(function(d){fill(sec,(d.results||[]).slice(0,15),'tv');});}
+function sKorean(sec){return tmdb('/discover/movie',{with_original_language:'ko',with_genres:'28|80|53',sort_by:'popularity.desc','vote_count.gte':80,without_genres:EXCL_GENRES}).then(function(d){fill(sec,(d.results||[]).slice(0,15),'movie');});}
 function sTver(sec){
   var el=document.getElementById('sec-'+sec.id);if(!el)return Promise.resolve();
   var h='<div class="sec-hdr"><span class="sec-title">'+sec.title+'</span></div><div style="padding:0 0 10px">';
@@ -430,7 +543,7 @@ function mkCard(item,type){
   if(poster)h+='<img class="c-img" src="'+poster+'" alt="'+esc(title)+'" loading="lazy">';
   else h+='<div class="c-np">🎬</div>';
   if(!isA){
-    h+='<button class="cqw '+(watched?'cqw-on':'cqw-off')+'" onclick="cqwC(event,'+id+')">'+(watched?'✓':'👁')+'</button>';
+    h+='<button class="cqw '+(watched?'cqw-on':'cqw-off')+'" onclick="cqwC(event,'+id+',\''+tid+'\')">'+(watched?'✓':'👁')+'</button>';
     h+='<button class="cwl'+(saved?' on':'')+'" onclick="cwlC(event,'+id+')">'+(saved?'♥':'♡')+'</button>';
   }
   h+='<div class="c-ov"><div class="c-title">'+esc(title)+'</div><div class="c-meta">';
@@ -440,12 +553,27 @@ function mkCard(item,type){
   if(item._pick)h+='<span class="cbg cbg-g">🏆 イチオシ</span>';
   if(item._th)h+='<span class="cbg cbg-t">上映中</span>';
   if(item._pl)h+='<span class="cbg '+item._pc+'">'+esc(item._pl)+'</span>';
+  if(item._sub&&!item._pick&&!item._pl)h+='<span class="cbg cbg-s">✓ 配信中</span>';
   if(isA)h+='<span class="cbg cbg-a">アニメ</span>';
   if(isTV&&!isA)h+='<span class="cbg cbg-d">ドラマ</span>';
   h+='</div></div></div>';return h;
 }
 function cwlC(e,id){e.stopPropagation();_wl(id);var on=S.myList.indexOf(id)!==-1;e.target.textContent=on?'♥':'♡';e.target.classList.toggle('on',on);}
-function cqwC(e,id){e.stopPropagation();var i=S.watched.indexOf(id);if(i===-1)S.watched.push(id);else S.watched.splice(i,1);saveW();var on=S.watched.indexOf(id)!==-1;e.target.textContent=on?'✓':'👁';e.target.className='cqw '+(on?'cqw-on':'cqw-off');}
+function cqwC(e,id,type){
+  e.stopPropagation();
+  var i=S.watched.indexOf(id);
+  if(i===-1){
+    S.watched.push(id);
+    if(!S.genreMap[String(id)]&&type!=='anime'){
+      var ep=(type==='tv')?'/tv/':'/movie/';
+      tmdb(ep+id).then(function(d){if(d.genres){S.genreMap[String(id)]=d.genres.map(function(g){return g.id;});saveGM();}}).catch(function(){});
+    }
+  } else S.watched.splice(i,1);
+  saveW();
+  var on=S.watched.indexOf(id)!==-1;
+  e.target.textContent=on?'✓':'👁';
+  e.target.className='cqw '+(on?'cqw-on':'cqw-off');
+}
 function _wl(id){var i=S.myList.indexOf(id);if(i===-1)S.myList.push(id);else S.myList.splice(i,1);saveL();}
 
 function openModal(id,type){
@@ -531,7 +659,16 @@ function animeM(a){
   h+='</div></div></div>';return h;
 }
 function mWL(id){_wl(id);var on=S.myList.indexOf(id)!==-1;var b=document.getElementById('m-wl');if(b){b.textContent=on?'❤️ 保存済':'🤍 保存';b.classList.toggle('on',on);}}
-function mWD(id){var i=S.watched.indexOf(id);if(i===-1)S.watched.push(id);else S.watched.splice(i,1);saveW();var on=S.watched.indexOf(id)!==-1;var b=document.getElementById('m-wd');if(b){b.textContent=on?'✅ 視聴済':'☑ 視聴済';b.classList.toggle('on',on);}}
+function mWD(id){
+  var i=S.watched.indexOf(id);
+  if(i===-1){
+    S.watched.push(id);
+    if(!S.genreMap[String(id)]){
+      tmdb('/movie/'+id).then(function(d){if(d.genres){S.genreMap[String(id)]=d.genres.map(function(g){return g.id;});saveGM();}}).catch(function(){});
+    }
+  } else S.watched.splice(i,1);
+  saveW();var on=S.watched.indexOf(id)!==-1;var b=document.getElementById('m-wd');if(b){b.textContent=on?'✅ 視聴済':'☑ 視聴済';b.classList.toggle('on',on);}
+}
 function showStars(n){document.querySelectorAll('.star').forEach(function(s){s.classList.toggle('on',parseInt(s.getAttribute('data-v'))<=n);});}
 function setRat(id,n){S.ratings[String(id)]=n;saveR();showStars(n);}
 function closeModal(){document.getElementById('modal-ov').classList.remove('open');}
@@ -560,7 +697,7 @@ function renderML(){
     h+='<div class="ml-st">❤️ マイリスト（'+S.myList.length+'件）</div>';
     h+='<div style="font-size:12px;color:var(--t3);margin-bottom:10px">作品をタップして詳細を確認</div>';
   }
-  if(S.watched.length){h+='<div class="ml-st">✅ 視聴済み（'+S.watched.length+'件）</div><div style="font-size:12px;color:var(--t3)">カードの 👁 をタップして簡単に追加</div>';}
+  if(S.watched.length){h+='<div class="ml-st">✅ 視聴済み（'+S.watched.length+'件）</div><div style="font-size:12px;color:var(--t3)">カードの 👁 をタップして簡単に追加・好み学習に利用</div>';}
   if(!S.myList.length&&!S.watched.length){h+='<div class="empty" style="padding-top:60px"><div class="ei">❤️</div><div>マイリストに作品がありません</div><div style="font-size:12px;color:var(--t3);margin-top:8px">♡ をタップして保存<br>👁 をタップして視聴済み登録</div></div>';}
   h+='</div>';el.innerHTML=h;
 }
@@ -578,7 +715,7 @@ function renderSet(){
   var h='<div class="set-wrap">';
   h+='<div class="set-card">';
   h+='<div class="set-row"><span class="set-lbl">🎬 好みを設定する</span><button class="set-btn" onclick="openQ()">アンケート</button></div>';
-  h+='<div class="set-row"><span class="set-lbl" style="font-size:12px;color:var(--t2)">加入サービス・好きなジャンルから<br>イチオシを選別します</span></div>';
+  h+='<div class="set-row"><span class="set-lbl" style="font-size:12px;color:var(--t2)">加入サービス・好きなジャンルから<br>イチオシ・今夜の1本を選別します</span></div>';
   h+='</div>';
   h+='<div class="set-card">';
   h+='<div class="set-row" style="background:rgba(255,255,255,.03)"><span class="set-lbl">📡 配信サービスセクション</span><span class="set-val">ON/OFFで表示切替</span></div>';
@@ -592,7 +729,7 @@ function renderSet(){
   h+='</div>';
   h+='<div class="set-card"><div class="set-row"><span class="set-lbl">TMDB APIキー</span></div><div style="padding:4px 14px 14px"><input class="set-inp" id="set-key" value="'+esc(KEY)+'"><button class="set-btn" onclick="saveKey()">保存</button></div></div>';
   h+='<div class="set-card"><div class="set-row"><span class="set-lbl">データ管理</span><span class="set-val">保存'+S.myList.length+'件 / 視聴済'+S.watched.length+'件</span></div><div style="padding:4px 14px 14px"><button class="set-btn d" onclick="clearAll()">すべてリセット</button></div></div>';
-  h+='<div class="set-card"><div class="set-row"><span class="set-lbl">CineMatch</span><span class="set-val">v4.0</span></div><div style="padding:4px 14px 14px;font-size:11px;color:var(--t3)">データ提供: TMDB / MyAnimeList (Jikan API)</div></div>';
+  h+='<div class="set-card"><div class="set-row"><span class="set-lbl">CineMatch</span><span class="set-val">v5.0</span></div><div style="padding:4px 14px 14px;font-size:11px;color:var(--t3)">データ提供: TMDB / MyAnimeList (Jikan API)</div></div>';
   h+='</div>';
   el.innerHTML=h;
 }
@@ -614,7 +751,7 @@ function openQ(){
 }
 function renderQ(){
   var svcs=[{id:'unext',lbl:'📺 U-NEXT'},{id:'prime',lbl:'▶ Amazon Prime'},{id:'nflx',lbl:'🎥 Netflix'},{id:'hulu',lbl:'📺 Hulu'},{id:'disney',lbl:'✨ Disney+'}];
-  var gens=[{id:28,lbl:'アクション'},{id:878,lbl:'SF'},{id:53,lbl:'スリラー'},{id:9648,lbl:'ミステリー'},{id:16,lbl:'アニメ'},{id:35,lbl:'コメディ'},{id:18,lbl:'ドラマ'},{id:10749,lbl:'ロマンス'},{id:12,lbl:'冒険'},{id:14,lbl:'ファンタジー'},{id:80,lbl:'犯罪'},{id:36,lbl:'歴史'}];
+  var gens=[{id:28,lbl:'アクション'},{id:878,lbl:'SF'},{id:53,lbl:'スリラー'},{id:9648,lbl:'ミステリー'},{id:16,lbl:'アニメーション'},{id:35,lbl:'コメディ'},{id:18,lbl:'ドラマ'},{id:10749,lbl:'ロマンス'},{id:12,lbl:'冒険'},{id:14,lbl:'ファンタジー'},{id:80,lbl:'犯罪'},{id:36,lbl:'歴史'}];
   var h='<div class="quiz-title">🎬 CineMatch</div>';
   h+='<div class="quiz-sub">加入中のサービスとお好みのジャンルを選んでください</div>';
   h+='<div class="quiz-step">① 加入している配信サービス（イチオシ選別に使用）</div>';
