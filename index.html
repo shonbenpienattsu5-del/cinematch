@@ -11,9 +11,9 @@
 :root{
   --bg:#060810;--s1:#0a0f1e;--s2:#111829;--s3:#182237;--s4:#1f2d4a;
   --gold:#c9a227;--gold2:#f0c840;--text:#f0e8d5;--t2:#8499b8;--t3:#3d4f6a;
-  --prime:#1299cc;--unext:#cc1e4a;--nflx:#b81414;--tver:#0099e0;--stage:#2a8f5a;
+  --prime:#1299cc;--unext:#cc1e4a;--nflx:#b81414;--tver:#0099e0;--stage:#2a8f5a;--hulu:#40b87c;
   --r:10px;--nav:58px;--safe:env(safe-area-inset-bottom,0px);
-  --hdr:52px;--top:calc(52px + env(safe-area-inset-top,0px));
+  --hdr:52px;--top:calc(56px + env(safe-area-inset-top,0px));
 }
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 body{color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;font-size:14px}
@@ -24,7 +24,7 @@ body{color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sa
 #logo-text{font-size:16px;font-weight:900;letter-spacing:2.5px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 #hdr-right{display:flex;gap:8px;margin-left:auto}
 .hdr-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:var(--text);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav) + var(--safe))}
+#content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-top:var(--top);padding-bottom:calc(var(--nav) + var(--safe))}
 #bnav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe));padding-bottom:var(--safe);background:linear-gradient(to top,rgba(6,8,16,.98) 80%,transparent);display:flex;z-index:100;border-top:1px solid rgba(255,255,255,.05)}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;color:var(--t2);cursor:pointer;font-size:10px;padding:4px 0;transition:color .2s}
 .nb .ni{font-size:21px;line-height:1}
@@ -67,7 +67,7 @@ body{color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sa
 .cbg-p{background:var(--prime);color:#fff}.cbg-u{background:var(--unext);color:#fff}
 .cbg-n{background:var(--nflx);color:#fff}.cbg-t{background:var(--stage);color:#fff}
 .cbg-a{background:#7b2d8b;color:#fff}.cbg-d{background:var(--s4);color:var(--t2)}
-.cbg-g{background:var(--gold);color:#000}
+.cbg-g{background:var(--gold);color:#000}.cbg-h{background:var(--hulu);color:#fff}
 .cwl{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
 .cwl.on{color:var(--gold)}
 .cqw{position:absolute;top:5px;left:5px;width:22px;height:22px;border-radius:50%;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:background .2s}
@@ -128,10 +128,10 @@ body{color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sa
 #srch-res{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:12px;padding:12px 14px}
 @media(min-width:500px){.sgrid{grid-template-columns:repeat(auto-fill,minmax(145px,1fr))}}
-.ml-wrap{padding:calc(var(--top) + 12px) 14px 0}
+.ml-wrap{padding:12px 14px 0}
 .ml-st{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px}
 .ml-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;margin-bottom:20px}
-.set-wrap{padding:calc(var(--top) + 12px) 14px 0}
+.set-wrap{padding:12px 14px 0}
 .set-card{background:var(--s1);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
 .set-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--s2)}
 .set-row:last-child{border-bottom:none}
@@ -203,7 +203,8 @@ var IB='https://image.tmdb.org/t/p/w780';
 var IO='https://image.tmdb.org/t/p/original';
 var IF='https://image.tmdb.org/t/p/w138_and_h175_face';
 var SVC_SEARCH={'U-NEXT':'https://video.unext.jp/search?query=','Amazon Prime Video':'https://www.amazon.co.jp/s?i=instant-video&k=','Prime Video':'https://www.amazon.co.jp/s?i=instant-video&k=','Netflix':'https://www.netflix.com/search?q=','Hulu':'https://www.hulu.jp/search#','Disney Plus':'https://www.disneyplus.com/search/'};
-var S={myList:[],watched:[],ratings:{},pc:{},hi:[],hx:0,ht:null,st:null,genreMap:{},prefs:{genres:[28,878,53,9648],services:['unext','prime'],hideNflx:false,setup:false}};
+var PROV_IDS={unext:'39',prime:'9|119',nflx:'8|213',hulu:'11',disney:'337'};
+var S={myList:[],watched:[],ratings:{},pc:{},hi:[],hx:0,ht:null,st:null,genreMap:{},prefs:{genres:[28,878,53,9648],services:['unext','prime'],setup:false}};
 var qSvc=[],qGenres=[];
 
 function loadSt(){
@@ -211,7 +212,13 @@ function loadSt(){
   try{S.watched=JSON.parse(localStorage.getItem('cm_w')||'[]')}catch(e){}
   try{S.ratings=JSON.parse(localStorage.getItem('cm_r')||'{}')}catch(e){}
   try{S.genreMap=JSON.parse(localStorage.getItem('cm_gm')||'{}')}catch(e){}
-  try{var p=JSON.parse(localStorage.getItem('cm_prefs')||'{}');if(p.genres)S.prefs.genres=p.genres;if(p.services)S.prefs.services=p.services;if(p.hideNflx!==undefined)S.prefs.hideNflx=p.hideNflx;if(p.setup!==undefined)S.prefs.setup=p.setup;}catch(e){}
+  try{
+    var p=JSON.parse(localStorage.getItem('cm_prefs')||'{}');
+    if(p.genres)S.prefs.genres=p.genres;
+    if(p.services)S.prefs.services=p.services;
+    else if(p.hideNflx!==undefined){S.prefs.services=['unext','prime'];if(!p.hideNflx)S.prefs.services.push('nflx');}
+    if(p.setup!==undefined)S.prefs.setup=p.setup;
+  }catch(e){}
   var k=localStorage.getItem('cm_key');if(k)KEY=k;
 }
 function saveL(){localStorage.setItem('cm_l',JSON.stringify(S.myList))}
@@ -236,6 +243,16 @@ function getTopGenreStr(n){
   var w=getGenreWeights();
   var top=Object.keys(w).filter(function(g){return w[g]>0;}).sort(function(a,b){return w[b]-w[a];}).slice(0,n||5);
   return top.length?top.join('|'):'28|878|53|9648';
+}
+function getSubProvStr(){
+  var parts=[];
+  var svcs=S.prefs.services||['unext','prime'];
+  for(var i=0;i<svcs.length;i++){if(PROV_IDS[svcs[i]])parts.push(PROV_IDS[svcs[i]]);}
+  return parts.length?parts.join('|'):'39|9|119';
+}
+function secVisible(s){
+  if(!s.svcKey)return true;
+  return (S.prefs.services||[]).indexOf(s.svcKey)!==-1;
 }
 
 function tmdb(path,p){
@@ -267,26 +284,28 @@ function goTab(t){
 }
 
 var SECS=[
-  {id:'pick',   title:'🏆 今週のあなたへのイチオシ', fn:sPick},
-  {id:'trend',  title:'🔥 今週のトレンド',            fn:sTrend},
-  {id:'theater',title:'🎬 映画館で上映中',             fn:sTheater},
-  {id:'rec',    title:'⭐ あなたへのおすすめ',         fn:sRec},
-  {id:'unext',  title:'📺 U-NEXTで配信中',            fn:sUnext},
-  {id:'prime',  title:'▶ Amazon Primeで配信中',       fn:sPrime},
-  {id:'nflx',   title:'🎥 Netflixで配信中',           fn:sNflx,hideKey:'hideNflx'},
-  {id:'anime',  title:'🌸 アニメ 最新・話題作',        fn:sAnime},
-  {id:'drama',  title:'🎭 日本ドラマ・注目作',         fn:sDrama},
-  {id:'korean', title:'🇰🇷 韓国・アジア映画',           fn:sKorean},
-  {id:'tver',   title:'📡 TVer・地上波リンク',         fn:sTver},
+  {id:'pick',    title:'🏆 今週のあなたへのイチオシ', fn:sPick},
+  {id:'trend',   title:'🔥 今週のトレンド',            fn:sTrend},
+  {id:'theater', title:'🎬 映画館で上映中',             fn:sTheater},
+  {id:'rec',     title:'⭐ あなたへのおすすめ',         fn:sRec},
+  {id:'unext',   title:'📺 U-NEXTで配信中',            fn:sUnext, svcKey:'unext'},
+  {id:'prime',   title:'▶ Amazon Primeで配信中',       fn:sPrime, svcKey:'prime'},
+  {id:'nflx',    title:'🎥 Netflixで配信中',           fn:sNflx,  svcKey:'nflx'},
+  {id:'hulu',    title:'📺 Huluで配信中',              fn:sHulu,  svcKey:'hulu'},
+  {id:'disney',  title:'✨ Disney+で配信中',            fn:sDisney,svcKey:'disney'},
+  {id:'anime',   title:'🌸 アニメ 最新・話題作',        fn:sAnime},
+  {id:'drama',   title:'🎭 日本ドラマ・注目作',         fn:sDrama},
+  {id:'korean',  title:'🇰🇷 韓国・アジア映画',          fn:sKorean},
+  {id:'tver',    title:'📡 TVer・地上波リンク',         fn:sTver},
 ];
 
 function buildHome(){
   var el=document.getElementById('tab-home');
-  var h='<div style="padding-top:var(--top)">';
+  var h='';
   h+='<div id="hero-wrap" style="position:relative;width:100%;height:60vw;min-height:260px;max-height:420px;overflow:hidden;background:var(--s2);margin-bottom:4px"><div class="loading"><div class="spin"></div></div></div>';
   for(var i=0;i<SECS.length;i++){
     var s=SECS[i];
-    if(s.hideKey&&S.prefs[s.hideKey])continue;
+    if(!secVisible(s))continue;
     var isPick=s.id==='pick';
     h+='<div class="section" id="sec-'+s.id+'">';
     h+='<div class="sec-hdr"><span class="sec-title">'+s.title+'</span>';
@@ -296,13 +315,12 @@ function buildHome(){
     for(var j=0;j<7;j++)h+='<div class="skel-c"></div>';
     h+='</div></div>';
   }
-  h+='</div>';
   el.innerHTML=h;
 }
 function loadHome(){
   buildHome();loadHero();
   var i=0;
-  var vis=SECS.filter(function(s){return!s.hideKey||!S.prefs[s.hideKey];});
+  var vis=SECS.filter(function(s){return secVisible(s);});
   function next(){if(i>=vis.length)return;var s=vis[i++];s.fn(s).catch(function(){}).then(function(){setTimeout(next,130);});}
   next();
 }
@@ -352,9 +370,10 @@ function fill(sec,items,type){
 
 function sPick(sec){
   var gStr=getTopGenreStr(5);
+  var provStr=getSubProvStr();
   return Promise.all([
-    tmdb('/discover/movie',{with_genres:gStr,sort_by:'vote_average.desc','vote_count.gte':300,watch_region:'JP',with_original_language:'en|ja|ko',without_genres:'27'}),
-    tmdb('/discover/movie',{with_genres:gStr,sort_by:'popularity.desc','vote_count.gte':200,watch_region:'JP',without_genres:'27'})
+    tmdb('/discover/movie',{with_genres:gStr,sort_by:'vote_average.desc','vote_count.gte':300,watch_region:'JP',with_watch_providers:provStr,with_original_language:'en|ja|ko',without_genres:'27'}),
+    tmdb('/discover/movie',{with_genres:gStr,sort_by:'popularity.desc','vote_count.gte':200,watch_region:'JP',with_watch_providers:provStr,without_genres:'27'})
   ]).then(function(r){
     var seen={},items=[];
     function add(arr){(arr||[]).forEach(function(m){if(!seen[m.id]&&S.watched.indexOf(m.id)===-1){seen[m.id]=true;m._pick=true;items.push(m);}});}
@@ -380,6 +399,8 @@ function sRec(sec){
 function sUnext(sec){return tmdb('/discover/movie',{with_watch_providers:'39',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='U-NEXT';m._pc='cbg-u';});fill(sec,its,'movie');});}
 function sPrime(sec){return tmdb('/discover/movie',{with_watch_providers:'9|119',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Prime';m._pc='cbg-p';});fill(sec,its,'movie');});}
 function sNflx(sec){return tmdb('/discover/movie',{with_watch_providers:'8|213',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Netflix';m._pc='cbg-n';});fill(sec,its,'movie');});}
+function sHulu(sec){return tmdb('/discover/movie',{with_watch_providers:'11',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Hulu';m._pc='cbg-h';});fill(sec,its,'movie');});}
+function sDisney(sec){return tmdb('/discover/movie',{with_watch_providers:'337',watch_region:'JP',sort_by:'popularity.desc',without_genres:'27'}).then(function(d){var its=(d.results||[]).slice(0,15);its.forEach(function(m){m._pl='Disney+';m._pc='cbg-p';});fill(sec,its,'movie');});}
 function sAnime(sec){
   return jk('/seasons/now?limit=24').then(function(d){fill(sec,(d.data||[]).slice(0,16),'anime');})
   .catch(function(){return tmdb('/discover/tv',{with_genres:'16',with_original_language:'ja',sort_by:'popularity.desc'}).then(function(d){fill(sec,(d.results||[]).slice(0,15),'tv');});});
@@ -391,6 +412,7 @@ function sTver(sec){
   var h='<div class="sec-hdr"><span class="sec-title">'+sec.title+'</span></div><div style="padding:0 0 10px">';
   h+='<a href="https://tver.jp" target="_blank" class="tv-banner"><div class="tv-logo" style="background:var(--tver)">TVer</div><div class="tv-text"><h3>TVer（ティーバー）</h3><p>民放テレビ番組を無料配信・見逃し視聴</p></div><span style="color:var(--t3);font-size:18px;margin-left:auto">›</span></a>';
   h+='<a href="https://kinro.ntv.co.jp/" target="_blank" class="tv-banner"><div class="tv-logo" style="background:var(--s4);font-size:10px">金<br>ロー</div><div class="tv-text"><h3>金曜ロードショー</h3><p>毎週金曜21:00〜 放送スケジュール確認</p></div><span style="color:var(--t3);font-size:18px;margin-left:auto">›</span></a>';
+  h+='<a href="https://www.fujitv.co.jp/toku/satpre/" target="_blank" class="tv-banner"><div class="tv-logo" style="background:#e4007f;font-size:10px">土<br>プレ</div><div class="tv-text"><h3>土曜プレミアム</h3><p>毎週土曜21:00〜 フジテレビ 放送スケジュール</p></div><span style="color:var(--t3);font-size:18px;margin-left:auto">›</span></a>';
   h+='<a href="https://anime.eiga.com/now/" target="_blank" class="tv-banner"><div class="tv-logo" style="background:#7b2d8b;font-size:11px">放映</div><div class="tv-text"><h3>アニメ放映スケジュール</h3><p>今季アニメの放映・新作情報</p></div><span style="color:var(--t3);font-size:18px;margin-left:auto">›</span></a>';
   h+='</div>';el.innerHTML=h;return Promise.resolve();
 }
@@ -545,21 +567,44 @@ function renderML(){
 
 function renderSet(){
   var el=document.getElementById('tab-settings');
-  var nflxOn=!S.prefs.hideNflx;
-  el.innerHTML='<div class="set-wrap">'
-    +'<div class="set-card">'
-    +'<div class="set-row"><span class="set-lbl">🎬 好みを設定する</span><button class="set-btn" onclick="openQ()">アンケート</button></div>'
-    +'<div class="set-row"><span class="set-lbl" style="font-size:12px;color:var(--t2)">加入サービス・好きなジャンルから<br>イチオシを選別します</span></div>'
-    +'</div>'
-    +'<div class="set-card">'
-    +'<div class="set-row"><span class="set-lbl">🎥 Netflixセクション表示</span><label class="tgl"><input type="checkbox" id="nflx-tgl" '+(nflxOn?'checked':'')+' onchange="toggleNflx(this.checked)"><span class="tgl-sl"></span></label></div>'
-    +'</div>'
-    +'<div class="set-card"><div class="set-row"><span class="set-lbl">TMDB APIキー</span></div><div style="padding:4px 14px 14px"><input class="set-inp" id="set-key" value="'+esc(KEY)+'"><button class="set-btn" onclick="saveKey()">保存</button></div></div>'
-    +'<div class="set-card"><div class="set-row"><span class="set-lbl">データ管理</span><span class="set-val">保存'+S.myList.length+'件 / 視聴済'+S.watched.length+'件</span></div><div style="padding:4px 14px 14px"><button class="set-btn d" onclick="clearAll()">すべてリセット</button></div></div>'
-    +'<div class="set-card"><div class="set-row"><span class="set-lbl">CineMatch</span><span class="set-val">v3.0</span></div><div style="padding:4px 14px 14px;font-size:11px;color:var(--t3)">データ提供: TMDB / MyAnimeList (Jikan API)</div></div>'
-    +'</div>';
+  var svcs=S.prefs.services||['unext','prime'];
+  var svcDefs=[
+    {key:'unext', lbl:'📺 U-NEXT'},
+    {key:'prime', lbl:'▶ Amazon Prime'},
+    {key:'nflx',  lbl:'🎥 Netflix'},
+    {key:'hulu',  lbl:'📺 Hulu'},
+    {key:'disney',lbl:'✨ Disney+'},
+  ];
+  var h='<div class="set-wrap">';
+  h+='<div class="set-card">';
+  h+='<div class="set-row"><span class="set-lbl">🎬 好みを設定する</span><button class="set-btn" onclick="openQ()">アンケート</button></div>';
+  h+='<div class="set-row"><span class="set-lbl" style="font-size:12px;color:var(--t2)">加入サービス・好きなジャンルから<br>イチオシを選別します</span></div>';
+  h+='</div>';
+  h+='<div class="set-card">';
+  h+='<div class="set-row" style="background:rgba(255,255,255,.03)"><span class="set-lbl">📡 配信サービスセクション</span><span class="set-val">ON/OFFで表示切替</span></div>';
+  for(var i=0;i<svcDefs.length;i++){
+    var sd=svcDefs[i];
+    var on=svcs.indexOf(sd.key)!==-1;
+    h+='<div class="set-row"><span class="set-lbl">'+sd.lbl+'</span>';
+    h+='<label class="tgl"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleSvc(\''+sd.key+'\',this.checked)"><span class="tgl-sl"></span></label>';
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div class="set-card"><div class="set-row"><span class="set-lbl">TMDB APIキー</span></div><div style="padding:4px 14px 14px"><input class="set-inp" id="set-key" value="'+esc(KEY)+'"><button class="set-btn" onclick="saveKey()">保存</button></div></div>';
+  h+='<div class="set-card"><div class="set-row"><span class="set-lbl">データ管理</span><span class="set-val">保存'+S.myList.length+'件 / 視聴済'+S.watched.length+'件</span></div><div style="padding:4px 14px 14px"><button class="set-btn d" onclick="clearAll()">すべてリセット</button></div></div>';
+  h+='<div class="set-card"><div class="set-row"><span class="set-lbl">CineMatch</span><span class="set-val">v4.0</span></div><div style="padding:4px 14px 14px;font-size:11px;color:var(--t3)">データ提供: TMDB / MyAnimeList (Jikan API)</div></div>';
+  h+='</div>';
+  el.innerHTML=h;
 }
-function toggleNflx(show){S.prefs.hideNflx=!show;saveP();var sec=document.getElementById('sec-nflx');if(sec)sec.style.display=show?'block':'none';}
+function toggleSvc(key,show){
+  var i=S.prefs.services.indexOf(key);
+  if(show&&i===-1)S.prefs.services.push(key);
+  else if(!show&&i!==-1)S.prefs.services.splice(i,1);
+  saveP();
+  var sec=document.getElementById('sec-'+key);
+  if(show&&!sec){loadHome();return;}
+  if(sec)sec.style.display=show?'block':'none';
+}
 function saveKey(){var k=(document.getElementById('set-key')||{}).value;if(k&&k.trim()){KEY=k.trim();localStorage.setItem('cm_key',KEY);alert('保存しました');}}
 function clearAll(){if(!confirm('すべてのデータを削除しますか？'))return;localStorage.removeItem('cm_l');localStorage.removeItem('cm_w');localStorage.removeItem('cm_r');localStorage.removeItem('cm_gm');S.myList=[];S.watched=[];S.ratings={};S.genreMap={};renderML();}
 
@@ -568,11 +613,11 @@ function openQ(){
   document.getElementById('quiz-ov').style.display='flex';
 }
 function renderQ(){
-  var svcs=[{id:'unext',lbl:'📺 U-NEXT'},{id:'prime',lbl:'▶ Amazon Prime'},{id:'nflx',lbl:'🎥 Netflix'},{id:'disney',lbl:'✨ Disney+'}];
+  var svcs=[{id:'unext',lbl:'📺 U-NEXT'},{id:'prime',lbl:'▶ Amazon Prime'},{id:'nflx',lbl:'🎥 Netflix'},{id:'hulu',lbl:'📺 Hulu'},{id:'disney',lbl:'✨ Disney+'}];
   var gens=[{id:28,lbl:'アクション'},{id:878,lbl:'SF'},{id:53,lbl:'スリラー'},{id:9648,lbl:'ミステリー'},{id:16,lbl:'アニメ'},{id:35,lbl:'コメディ'},{id:18,lbl:'ドラマ'},{id:10749,lbl:'ロマンス'},{id:12,lbl:'冒険'},{id:14,lbl:'ファンタジー'},{id:80,lbl:'犯罪'},{id:36,lbl:'歴史'}];
   var h='<div class="quiz-title">🎬 CineMatch</div>';
-  h+='<div class="quiz-sub">好みを設定してパーソナライズされたおすすめを受け取りましょう</div>';
-  h+='<div class="quiz-step">① 加入している配信サービス</div>';
+  h+='<div class="quiz-sub">加入中のサービスとお好みのジャンルを選んでください</div>';
+  h+='<div class="quiz-step">① 加入している配信サービス（イチオシ選別に使用）</div>';
   h+='<div class="chk-grid">';
   svcs.forEach(function(s){h+='<div class="chk-item'+(qSvc.indexOf(s.id)!==-1?' on':'')+'" onclick="tqSvc(this,\''+s.id+'\')">'+s.lbl+'</div>';});
   h+='</div>';
@@ -587,8 +632,10 @@ function renderQ(){
 function tqSvc(el,id){var i=qSvc.indexOf(id);if(i===-1){qSvc.push(id);el.classList.add('on');}else{qSvc.splice(i,1);el.classList.remove('on');}}
 function tqG(el,id){var i=qGenres.indexOf(id);if(i===-1){qGenres.push(id);el.classList.add('on');}else{qGenres.splice(i,1);el.classList.remove('on');}}
 function finishQ(){
-  S.prefs.services=qSvc.slice();S.prefs.genres=qGenres.slice();
-  S.prefs.hideNflx=qSvc.indexOf('nflx')===-1;S.prefs.setup=true;saveP();
+  S.prefs.services=qSvc.slice();
+  S.prefs.genres=qGenres.slice();
+  S.prefs.setup=true;
+  saveP();
   document.getElementById('quiz-ov').style.display='none';
   loadHome();
 }
