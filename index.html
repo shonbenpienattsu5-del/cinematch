@@ -208,7 +208,7 @@ var EXCL_GENRES='27|35|36|99|10752|10402';
 var SVC_SEARCH={'U-NEXT':'https://video.unext.jp/search?query=','Amazon Prime Video':'https://www.amazon.co.jp/s?i=instant-video&k=','Prime Video':'https://www.amazon.co.jp/s?i=instant-video&k=','Netflix':'https://www.netflix.com/search?q=','Hulu':'https://www.hulu.jp/search#','Disney Plus':'https://www.disneyplus.com/search/'};
 var PROV_IDS={unext:'39',prime:'9|119',nflx:'8|213',hulu:'11',disney:'337'};
 var PROV_LINK={
-  39:{scheme:'unext://',store:'itms-apps://apps.apple.com/jp/app/u-next/id370966917'},
+  39:{search:'https://video.unext.jp/search?query=',store:'itms-apps://apps.apple.com/jp/app/u-next/id370966917'},
   9:{scheme:'primevideo://',store:'itms-apps://apps.apple.com/jp/app/prime-video/id545519333'},
   119:{scheme:'primevideo://',store:'itms-apps://apps.apple.com/jp/app/prime-video/id545519333'},
   8:{scheme:'nflxmobile://',store:'itms-apps://apps.apple.com/jp/app/netflix/id363590051'},
@@ -584,24 +584,24 @@ function cqwC(e,id,type){
   e.target.className='cqw '+(on?'cqw-on':'cqw-off');
 }
 function _wl(id){var i=S.myList.indexOf(id);if(i===-1)S.myList.push(id);else S.myList.splice(i,1);saveL();}
-function openOrStore(pid,title){
-  var info=PROV_LINK[pid];
-  if(!info)return;
+function openOrStore(url,storeUrl){
   var gone=false;
   var onVis=function(){if(document.hidden)gone=true;};
   document.addEventListener('visibilitychange',onVis);
-  window.location.href=info.scheme;
+  window.location.href=url;
   setTimeout(function(){
     document.removeEventListener('visibilitychange',onVis);
-    if(!gone)window.location.href=info.store;
+    if(!gone)window.location.href=storeUrl;
   },2000);
 }
 function handleProvClick(el){
   var pid=parseInt(el.getAttribute('data-pid')||'0');
   var title=el.getAttribute('data-title')||'';
   var info=PROV_LINK[pid];
-  if(info)openOrStore(pid,title);
-  else{var jw=el.getAttribute('data-jw');if(jw)window.open(jw,'_blank');}
+  if(info){
+    var url=info.search?(info.search+encodeURIComponent(title)):info.scheme;
+    openOrStore(url,info.store);
+  } else{var jw=el.getAttribute('data-jw');if(jw)window.open(jw,'_blank');}
 }
 
 function openModal(id,type){
