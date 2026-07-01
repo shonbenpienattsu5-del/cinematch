@@ -208,13 +208,13 @@ var EXCL_GENRES='27|35|36|99|10752|10402';
 var SVC_SEARCH={'U-NEXT':'https://video.unext.jp/search?query=','Amazon Prime Video':'https://www.amazon.co.jp/s?i=instant-video&k=','Prime Video':'https://www.amazon.co.jp/s?i=instant-video&k=','Netflix':'https://www.netflix.com/search?q=','Hulu':'https://www.hulu.jp/search#','Disney Plus':'https://www.disneyplus.com/search/'};
 var PROV_IDS={unext:'39',prime:'9|119',nflx:'8|213',hulu:'11',disney:'337'};
 var PROV_LINK={
-  39:{search:'https://video.unext.jp/search?query=',store:'itms-apps://apps.apple.com/jp/app/u-next/id370966917'},
-  9:{scheme:'primevideo://',store:'itms-apps://apps.apple.com/jp/app/prime-video/id545519333'},
-  119:{scheme:'primevideo://',store:'itms-apps://apps.apple.com/jp/app/prime-video/id545519333'},
-  8:{scheme:'nflxmobile://',store:'itms-apps://apps.apple.com/jp/app/netflix/id363590051'},
-  213:{scheme:'nflxmobile://',store:'itms-apps://apps.apple.com/jp/app/netflix/id363590051'},
-  11:{scheme:'hulu://',store:'itms-apps://apps.apple.com/jp/app/hulu/id354363137'},
-  337:{scheme:'disneyplus://',store:'itms-apps://apps.apple.com/jp/app/disney/id1446075923'}
+  39: {search:'https://video.unext.jp/search?query=',          store:'https://apps.apple.com/jp/app/u-next/id370966917'},
+  9:  {search:'https://www.primevideo.com/search/?phrase=',    store:'https://apps.apple.com/jp/app/prime-video/id545519333'},
+  119:{search:'https://www.primevideo.com/search/?phrase=',    store:'https://apps.apple.com/jp/app/prime-video/id545519333'},
+  8:  {search:'https://www.netflix.com/search?q=',             store:'https://apps.apple.com/jp/app/netflix/id363590051'},
+  213:{search:'https://www.netflix.com/search?q=',             store:'https://apps.apple.com/jp/app/netflix/id363590051'},
+  11: {search:'https://www.hulu.jp/search?q=',                 store:'https://apps.apple.com/jp/app/hulu/id354363137'},
+  337:{search:'https://www.disneyplus.com/search/',            store:'https://apps.apple.com/jp/app/disney/id1446075923'}
 };
 var S={myList:[],watched:[],ratings:{},pc:{},hi:[],hx:0,ht:null,st:null,genreMap:{},prefs:{genres:[28,878,53,9648,16],services:['unext','prime'],setup:false}};
 var qSvc=[],qGenres=[];
@@ -646,12 +646,16 @@ function itemM(m,provs,tk,type,jwLink){
   h+='</div>';
   h+='<div class="m-sec"><div class="m-sec-t">配信サービスで見る</div>';
   if(provs&&provs.length){
-    h+='<div style="font-size:11px;color:var(--t3);margin-bottom:7px">タップでアプリ起動 / 未インストールはApp Storeへ</div>';
+    h+='<div style="font-size:11px;color:var(--t3);margin-bottom:7px">アプリをタップで起動 · ↓でApp Store</div>';
     h+='<div class="m-provs">';var sp={};
     for(var i=0;i<provs.length;i++){var p=provs[i];if(sp[p.provider_id])continue;sp[p.provider_id]=true;var logo=p.logo_path?(IO+p.logo_path):'';
-      h+='<div class="pbadge" style="cursor:pointer" data-pid="'+p.provider_id+'" data-title="'+esc(title)+'" data-jw="'+(jwLink?esc(jwLink):'')+'" onclick="handleProvClick(this)">'+(logo?'<img class="plogo" src="'+logo+'" alt="">':'')+'<span>'+esc(p.provider_name)+'</span></div>';}
+      var pi2=PROV_LINK[p.provider_id];
+      var svcUrl=pi2?(pi2.search+encodeURIComponent(title)):(jwLink||'');
+      h+='<div style="display:flex;align-items:center;gap:3px;margin-bottom:4px">';
+      h+='<a href="'+esc(svcUrl)+'" target="_blank" class="pbadge" style="text-decoration:none;flex:1">'+(logo?'<img class="plogo" src="'+logo+'" alt="">':'')+'<span>'+esc(p.provider_name)+'</span></a>';
+      if(pi2)h+='<a href="'+esc(pi2.store)+'" target="_blank" style="font-size:10px;padding:5px 8px;background:var(--s3);border-radius:6px;color:var(--t3);text-decoration:none;white-space:nowrap;border:1px solid var(--s4)">↓ DL</a>';
+      h+='</div>';}
     h+='</div>';
-    if(jwLink)h+='<a href="'+esc(jwLink)+'" target="_blank" style="display:inline-block;margin-top:8px;font-size:11px;color:var(--t3);text-decoration:none">その他の視聴方法（JustWatch）›</a>';
   } else h+='<div style="color:var(--t3);font-size:12px">日本での配信情報なし</div>';
   h+='</div>';
   var cast=((m.credits||{}).cast||[]).slice(0,12);
