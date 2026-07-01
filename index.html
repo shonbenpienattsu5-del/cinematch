@@ -599,8 +599,13 @@ function handleProvClick(el){
   var title=el.getAttribute('data-title')||'';
   var info=PROV_LINK[pid];
   if(info){
-    var url=info.search?(info.search+encodeURIComponent(title)):info.scheme;
-    openOrStore(url,info.store);
+    if(info.search){
+      var a=document.createElement('a');
+      a.href=info.search+encodeURIComponent(title);
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+    } else {
+      openOrStore(info.scheme,info.store);
+    }
   } else{var jw=el.getAttribute('data-jw');if(jw)window.open(jw,'_blank');}
 }
 
